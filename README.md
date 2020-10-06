@@ -90,7 +90,7 @@ Create the parent element of **drawflow**.
 Start drawflow.
 ```javascript
 var id = document.getElementById("drawflow");
-const editor = new Drawflow(id);
+const editor = new DrawflowModule(id);
 editor.start();
 ```
 Parameter | Type | Description
@@ -103,7 +103,7 @@ Parameter | Type | Description
 import Vue from 'vue'
 
 // Pass render Vue
-this.editor = new Drawflow(id, Vue);
+this.editor = new DrawflowModule(id, Vue);
 ```
 
 ### Nuxt

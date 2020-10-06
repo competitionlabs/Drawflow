@@ -1,3 +1,6 @@
+import Ajax from '../utils/Ajax';
+import query from '../utils/query';
+
 export default class Drawflow {
   constructor(container, render = null) {
     this.events = {};
@@ -47,6 +50,10 @@ export default class Drawflow {
     // Mobile
     this.evCache = new Array();
     this.prevDiff = -1;
+
+    // helpers
+    this.Ajax = Ajax;
+    this.queryHelper = query;
   }
 
   start () {
