@@ -1,7 +1,12 @@
 const webpackDevConfig = require('./webpack.dev.config');
+const webpackProdConfig = require('./webpack.prod.config');
 
 module.exports = (env) => {
-  return webpackDevConfig;
+  if (process.env && process.env.mode) {
+    return (process.env.mode === "prod") ? webpackProdConfig : webpackDevConfig;
+  } else {
+    return webpackDevConfig;
+  }
 };
 
 // module.exports = {

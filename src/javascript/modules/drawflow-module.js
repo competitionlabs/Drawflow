@@ -1,7 +1,7 @@
 import Ajax from '../utils/Ajax';
 import query from '../utils/query';
 
-export default class Drawflow {
+export default class DrawflowModule {
   constructor(container, render = null) {
     this.events = {};
     this.container = container;
@@ -50,6 +50,9 @@ export default class Drawflow {
     // Mobile
     this.evCache = new Array();
     this.prevDiff = -1;
+
+    // Theme
+    this.containerItemTemplate = function(dataNode){ return dataNode.html; }
 
     // helpers
     this.Ajax = Ajax;
@@ -1352,7 +1355,11 @@ export default class Drawflow {
     const content = document.createElement('div');
     content.classList.add("drawflow_content_node");
     if(typenode === false) {
-      content.innerHTML = html;
+      if(typeof html === "string") {
+        content.innerHTML = html;
+      }else{
+        content.appendChild(html);
+      }
     } else if (typenode === true) {
       content.appendChild(this.noderegister[html].html.cloneNode(true));
     } else {
@@ -1473,7 +1480,12 @@ export default class Drawflow {
     //content.innerHTML = dataNode.html;
 
     if(dataNode.typenode === false) {
-      content.innerHTML = dataNode.html;
+      const template = this.containerItemTemplate(dataNode);
+      if (typeof template === "string"){
+        content.innerHTML = template;
+      } else {
+        content.appendChild(template);
+      }
     } else if (dataNode.typenode === true) {
       content.appendChild(this.noderegister[dataNode.html].html.cloneNode(true));
     } else {

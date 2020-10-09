@@ -4,9 +4,8 @@
   "description": "Simple flow library",
   "main": "dist/drawflow.min.js",
   "scripts": {
-    "dev": "cross-env env.LANG=en webpack-dev-server --config ./webpack/webpack.config.js --progress",
-    "dev2": "webpack-dev-server --mode development --open --host 0.0.0.0",
-    "build": "webpack --mode=production && gulp",
+    "dev": "cross-env --env.mode=dev webpack-dev-server --config ./webpack/webpack.config.js --progress",
+    "build": "rimraf build && cross-env --env.mode=prod webpack --config ./webpack/webpack.config.js --progress",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
