@@ -124,7 +124,7 @@ import query from './utils/query';
 		 * @param ev
 		 */
 		this.drop = function (ev) {
-			if (ev.type === "touchend" || v.type === "drop") {
+			if (ev.type === "touchend") {
 				var parentdrawflow = document.elementFromPoint(drawInstance.settings.mobile_last_move.touches[0].clientX, drawInstance.settings.mobile_last_move.touches[0].clientY).closest("#drawflow");
 				if (parentdrawflow != null) {
 					drawInstance.addNodeToDrawFlow(drawInstance.settings.mobile_item_selec, drawInstance.settings.mobile_last_move.touches[0].clientX, drawInstance.settings.mobile_last_move.touches[0].clientY);
@@ -135,6 +135,8 @@ import query from './utils/query';
 				// var data = ev.dataTransfer.getData("node");
 				var data = drawInstance.settings.mobile_item_selec;
 				drawInstance.addNodeToDrawFlow(data, ev.clientX, ev.clientY);
+
+				drawInstance.settings.mobile_item_selec = '';
 			}
 
 		}

@@ -1354,7 +1354,7 @@ export default class DrawflowModule {
 
     const content = document.createElement('div');
     content.classList.add("drawflow_content_node");
-    console.log(name, html);
+
     if(typenode === false) {
       if(typeof html === "string") {
         content.innerHTML = html;
