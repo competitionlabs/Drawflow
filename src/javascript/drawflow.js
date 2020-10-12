@@ -2,6 +2,8 @@ import './polyfills';
 import objectIterator from './utils/objectIterator';
 import mapObject from './utils/mapObject';
 import mergeObjects from './utils/mergeObjects';
+import hasClass from './utils/hasClass';
+import closest from './utils/closest';
 import DrawflowModule from './modules/drawflow-module';
 import Ajax from './utils/Ajax';
 import query from './utils/query';
@@ -25,7 +27,6 @@ import query from './utils/query';
 			mobile_last_move: null,
 			transform: '',
 			containerItemTemplate: function( classType ){
-
 				var data = {};
 				mapObject(drawInstance.settings.dataObjects.listData, function (listItem) {
 					if( listItem.class === classType ){
@@ -108,12 +109,22 @@ import query from './utils/query';
 			if (ev.type === "touchstart") {
 				drawInstance.settings.mobile_item_selec = ev.target.closest(".drag-drawflow").getAttribute('data-node');
 			} else {
-				ev.dataTransfer.setData("node", ev.target.getAttribute('data-node'));
+				drawInstance.settings.mobile_item_selec = ev.target.closest(".drag-drawflow").getAttribute('data-node');
+				// ev.dataTransfer.setData("node", ev.target.getAttribute('data-node'));
 			}
 		}
 
+		/**
+		 * main handler that handles information transfer on touchend/drop events:
+		 *
+		 * - Event dataTransfer:
+		 *   - MDN: https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer
+		 *   - issues:  This feature is non-standard and is not on a standards track. Do not use it on production sites facing the Web: it will not work for every user. There may also be large incompatibilities between implementations and the behavior may change in the future.
+		 *
+		 * @param ev
+		 */
 		this.drop = function (ev) {
-			if (ev.type === "touchend") {
+			if (ev.type === "touchend" || v.type === "drop") {
 				var parentdrawflow = document.elementFromPoint(drawInstance.settings.mobile_last_move.touches[0].clientX, drawInstance.settings.mobile_last_move.touches[0].clientY).closest("#drawflow");
 				if (parentdrawflow != null) {
 					drawInstance.addNodeToDrawFlow(drawInstance.settings.mobile_item_selec, drawInstance.settings.mobile_last_move.touches[0].clientX, drawInstance.settings.mobile_last_move.touches[0].clientY);
@@ -121,7 +132,8 @@ import query from './utils/query';
 				drawInstance.settings.mobile_item_selec = '';
 			} else {
 				ev.preventDefault();
-				var data = ev.dataTransfer.getData("node");
+				// var data = ev.dataTransfer.getData("node");
+				var data = drawInstance.settings.mobile_item_selec;
 				drawInstance.addNodeToDrawFlow(data, ev.clientX, ev.clientY);
 			}
 
@@ -177,6 +189,20 @@ import query from './utils/query';
 
 		this.eventListeners = function () {
 			var _this = this;
+
+			_this.settings.container.addEventListener('click', function(event){
+				var el = event.target;
+
+				if ( hasClass(el, "drawflow-clear") || closest(el, ".drawflow-clear") !== null ) {
+					_this.settings.drawFlowModule.clearModuleSelected();
+				} else if ( hasClass(el, "drawflow-zoom-out") || closest(el, ".drawflow-zoom-out") !== null ) {
+					_this.settings.drawFlowModule.zoom_out();
+				} else if ( hasClass(el, "drawflow-zoom-reset") || closest(el, ".drawflow-zoom-reset") !== null ) {
+					_this.settings.drawFlowModule.zoom_reset();
+				} else if ( hasClass(el, "drawflow-zoom-in") || closest(el, ".drawflow-zoom-in") !== null ) {
+					_this.settings.drawFlowModule.zoom_in();
+				}
+			}, false);
 
 			// Event examples
 			/*_this.settings.drawFlowModule.on('nodeCreated', function (id) {
