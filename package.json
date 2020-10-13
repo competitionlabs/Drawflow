@@ -1,6 +1,6 @@
 {
   "name": "@competitionlabs/drawflow",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "description": "Simple flow library",
   "main": "dist/javascript/drawflow.js",
   "style": "dist/css/style.css",
