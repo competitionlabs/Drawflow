@@ -166,7 +166,7 @@ import query from './utils/query';
 			drawInstance.settings.containerItemData(id, function(data){
 				const item = drawInstance.settings.containerItemTemplate(id, data);
 
-				drawInstance.settings.drawFlowModule.addNode(id, 1, 1, pos_x, pos_y, 'aws', data, item);
+				drawInstance.settings.drawFlowModule.addNode(id, 1, 1, pos_x, pos_y, id, data, item);
 			});
 
 		}
