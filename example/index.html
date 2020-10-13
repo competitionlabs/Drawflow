@@ -58,6 +58,11 @@
 			const data = JSON.parse(response);
 
 			editor.settings.dataObjects.data = data;
+
+			editor.settings.drawFlowModule.on('nodeSelected', function (id) {
+				console.log("Node selected " + id, editor.settings.drawFlowModule.export());
+			});
+
 			editor.init();
 		}
 	});

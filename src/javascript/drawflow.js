@@ -26,13 +26,28 @@ import query from './utils/query';
 			mobile_item_selec: '',
 			mobile_last_move: null,
 			transform: '',
-			containerItemTemplate: function( classType ){
-				var data = {};
-				mapObject(drawInstance.settings.dataObjects.listData, function (listItem) {
-					if( listItem.class === classType ){
-						data = listItem;
-					}
-				})
+			containerItemData: function(id, callback){
+				if ( typeof callback === "function" ) {
+					var found = false;
+					mapObject(drawInstance.settings.dataObjects.listData, function (listItem) {
+						if (!found && listItem.class === id) {
+							found = true;
+							callback(listItem);
+						}
+					});
+				}
+			},
+			containerItemTemplate: function( id, data ){
+				var dataObj = {};
+				if( typeof data === "undefined" ) {
+					mapObject(drawInstance.settings.dataObjects.listData, function (listItem) {
+						if (listItem.class === id) {
+							dataObj = listItem;
+						}
+					});
+				} else {
+					dataObj = data;
+				}
 
 				const item = document.createElement("div"),
 					icon = document.createElement("i"),
@@ -41,10 +56,10 @@ import query from './utils/query';
 
 				item.setAttribute("class", "drag-drawflow-item");
 
-				icon.setAttribute("class", "fab fa-" + data.class);
+				icon.setAttribute("class", "fab fa-" + dataObj.class);
 
 				titleBox.setAttribute("class", "drawflow-title-box title-box");
-				label.innerHTML = " " + data.name;
+				label.innerHTML = " " + dataObj.name;
 
 				titleBox.appendChild(icon);
 				titleBox.appendChild(label);
@@ -141,16 +156,19 @@ import query from './utils/query';
 
 		}
 
-		this.addNodeToDrawFlow = function (name, pos_x, pos_y) {
+		this.addNodeToDrawFlow = function (id, pos_x, pos_y) {
 			if (this.settings.drawFlowModule.editor_mode === 'fixed') {
 				return false;
 			}
 			pos_x = pos_x * (this.settings.drawFlowModule.precanvas.clientWidth / (this.settings.drawFlowModule.precanvas.clientWidth * this.settings.drawFlowModule.zoom)) - (this.settings.drawFlowModule.precanvas.getBoundingClientRect().x * (this.settings.drawFlowModule.precanvas.clientWidth / (this.settings.drawFlowModule.precanvas.clientWidth * this.settings.drawFlowModule.zoom)));
 			pos_y = pos_y * (this.settings.drawFlowModule.precanvas.clientHeight / (this.settings.drawFlowModule.precanvas.clientHeight * this.settings.drawFlowModule.zoom)) - (this.settings.drawFlowModule.precanvas.getBoundingClientRect().y * (this.settings.drawFlowModule.precanvas.clientHeight / (this.settings.drawFlowModule.precanvas.clientHeight * this.settings.drawFlowModule.zoom)));
 
-			const item = drawInstance.settings.containerItemTemplate(name);
+			drawInstance.settings.containerItemData(id, function(data){
+				const item = drawInstance.settings.containerItemTemplate(id, data);
 
-			this.settings.drawFlowModule.addNode('aws', 1, 1, pos_x, pos_y, 'aws', {"db": {"dbname": '', "key": ''}}, item);
+				drawInstance.settings.drawFlowModule.addNode(id, 1, 1, pos_x, pos_y, 'aws', data, item);
+			});
+
 		}
 
 		this.showpopup = function (e) {
