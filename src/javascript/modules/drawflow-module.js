@@ -508,7 +508,7 @@ export default class DrawflowModule {
 
               _thisInstance.dispatch('connectionCreated', callbackData);
 
-              this.connection_ele = null;
+              _thisInstance.connection_ele = null;
             });
 
 
