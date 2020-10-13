@@ -488,13 +488,18 @@ export default class DrawflowModule {
 
             var id_input = input_id.slice(5);
             var id_output = output_id.slice(5);
-            var data = { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class };
+            var data = { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class, extra_class_string: "" };
 
+            // Conection no exist save connection
             this.onBeforeConnectionCreate(data, this.drawflow, function( callbackData ){
               _thisInstance.connection_ele.classList.add("node_in_"+input_id);
               _thisInstance.connection_ele.classList.add("node_out_"+output_id);
               _thisInstance.connection_ele.classList.add(output_class);
               _thisInstance.connection_ele.classList.add(input_class);
+
+              if(callbackData.extra_class_string !== null && callbackData.extra_class_string.length > 0){
+                _thisInstance.connection_ele.add(callbackData.extra_class_string);
+              }
 
               _thisInstance.drawflow.drawflow[_thisInstance.module].data[id_output].outputs[output_class].connections.push( {"node": id_input, "output": input_class});
               _thisInstance.drawflow.drawflow[_thisInstance.module].data[id_input].inputs[input_class].connections.push( {"node": id_output, "input": output_class});
@@ -502,15 +507,15 @@ export default class DrawflowModule {
               _thisInstance.updateConnectionNodes('node-'+id_input);
 
               _thisInstance.dispatch('connectionCreated', callbackData);
+
+              this.connection_ele = null;
             });
-            // Conection no exist save connection
 
 
         } else {
           this.connection_ele.remove();
-        }
-
           this.connection_ele = null;
+        }
       } else {
         // Connection exists Remove Connection;
         this.connection_ele.remove();
@@ -729,7 +734,7 @@ export default class DrawflowModule {
       // Check connection exist
       if(exist === false) {
         //Create Connection
-        var data = { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class };
+        var data = { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class, extra_class_string: "" };
 
         this.onBeforeConnectionCreate(data, this.drawflow, function( callbackData ){
           _thisInstance.drawflow.drawflow[nodeOneModule].data[id_output].outputs[output_class].connections.push( {"node": id_input.toString(), "output": input_class});
@@ -747,6 +752,11 @@ export default class DrawflowModule {
             connection.classList.add("node_out_node-"+id_output);
             connection.classList.add(output_class);
             connection.classList.add(input_class);
+
+            if(callbackData.extra_class_string !== null && callbackData.extra_class_string.length > 0){
+              connection.classList.add(callbackData.extra_class_string);
+            }
+
             connection.appendChild(path);
             _thisInstance.precanvas.appendChild(connection);
             _thisInstance.updateConnectionNodes('node-'+id_output);
