@@ -1,5 +1,10 @@
 import Ajax from '../utils/Ajax';
 import query from '../utils/query';
+import hasClass from '../utils/hasClass';
+import addClass from '../utils/addClass';
+import objectIterator from '../utils/objectIterator';
+import closest from '../utils/closest';
+import removeClass from '../utils/removeClass';
 
 export default class DrawflowModule {
   constructor(container, render = null) {
@@ -51,6 +56,9 @@ export default class DrawflowModule {
     this.evCache = new Array();
     this.prevDiff = -1;
 
+    // mouseover lines/block event listeners on node
+    this.mouseOverNodeEventListeners = true;
+
     // Theme
     this.containerItemTemplate = function(dataNode){ return dataNode.html; }
     this.onBeforeConnectionCreate = function(data, drawFlowData, callback){
@@ -65,6 +73,8 @@ export default class DrawflowModule {
   }
 
   start () {
+    var _this = this;
+
     // console.info("Start Drawflow!!");
     this.container.classList.add("parent-drawflow");
     this.container.tabIndex = 0;
@@ -101,6 +111,50 @@ export default class DrawflowModule {
     this.container.onpointercancel = this.pointerup_handler.bind(this);
     this.container.onpointerout = this.pointerup_handler.bind(this);
     this.container.onpointerleave = this.pointerup_handler.bind(this);
+
+    if( this.mouseOverNodeEventListeners ) {
+      this.container.addEventListener("mouseover", function (ev) {
+        var el = ev.target;
+
+        if (hasClass(el, "drawflow-node") || closest(el, ".drawflow-node") !== null) {
+          var blockEl = hasClass(el, "drawflow-node") ? el : closest(el, ".drawflow-node");
+
+          objectIterator(query(_this.container, ".drawflow-node"), function (obj) {
+            if (obj.dataset.nodeId !== blockEl.dataset.nodeId) {
+              addClass(obj, "inactive");
+            }
+          });
+
+          objectIterator(query(_this.container, ".drawflow .node_out_node-" + blockEl.dataset.nodeId), function (obj) {
+            addClass(obj, "animated");
+          });
+
+          objectIterator(query(_this.container, ".drawflow .node_in_node-" + blockEl.dataset.nodeId), function (obj) {
+            addClass(obj, "animated");
+          });
+        }
+      });
+
+      this.container.addEventListener("mouseout", function (ev) {
+        var el = ev.target;
+
+        if (hasClass(el, "drawflow-node") || closest(el, ".drawflow-node") !== null) {
+          var blockEl = hasClass(el, "drawflow-node") ? el : closest(el, ".drawflow-node");
+
+          objectIterator(query(_this.container, ".drawflow .node_out_node-" + blockEl.dataset.nodeId), function (obj) {
+            removeClass(obj, "animated");
+          });
+
+          objectIterator(query(_this.container, ".drawflow .node_in_node-" + blockEl.dataset.nodeId), function (obj) {
+            removeClass(obj, "animated");
+          });
+
+          objectIterator(query(_this.container, ".drawflow-node"), function (obj) {
+            removeClass(obj, "inactive");
+          });
+        }
+      });
+    }
 
     this.load();
   }
@@ -497,8 +551,8 @@ export default class DrawflowModule {
               _thisInstance.connection_ele.classList.add(output_class);
               _thisInstance.connection_ele.classList.add(input_class);
 
-              if(callbackData.extra_class_string !== null && callbackData.extra_class_string.length > 0){
-                _thisInstance.connection_ele.add(callbackData.extra_class_string);
+              if( typeof callbackData.extra_class_string === "string" && callbackData.extra_class_string.length > 0 ){
+                _thisInstance.connection_ele.classList.add(callbackData.extra_class_string);
               }
 
               _thisInstance.drawflow.drawflow[_thisInstance.module].data[id_output].outputs[output_class].connections.push( {"node": id_input, "output": input_class});
@@ -753,7 +807,7 @@ export default class DrawflowModule {
             connection.classList.add(output_class);
             connection.classList.add(input_class);
 
-            if(callbackData.extra_class_string !== null && callbackData.extra_class_string.length > 0){
+            if( typeof callbackData.extra_class_string === "string" && callbackData.extra_class_string.length > 0 ){
               connection.classList.add(callbackData.extra_class_string);
             }
 
@@ -1342,6 +1396,19 @@ export default class DrawflowModule {
     return nodes;
   }
 
+  /**
+   * generate node
+   * @param name
+   * @param num_in
+   * @param num_out
+   * @param ele_pos_x
+   * @param ele_pos_y
+   * @param classoverride {String} Add extra information to the class string
+   * @param data
+   * @param html
+   * @param typenode
+   * @returns {number}
+   */
   addNode (name, num_in, num_out, ele_pos_x, ele_pos_y, classoverride, data, html, typenode = false) {
     const parent = document.createElement('div');
     parent.classList.add("parent-node");
@@ -1354,6 +1421,8 @@ export default class DrawflowModule {
       node.classList.add(classoverride);
     }
 
+    node.dataset.id = name;
+    node.dataset.nodeId = this.nodeId;
 
     const inputs = document.createElement('div');
     inputs.classList.add("inputs");
@@ -1466,6 +1535,11 @@ export default class DrawflowModule {
     if(dataNode.class != '') {
       node.classList.add(dataNode.class);
     }
+
+    if( typeof dataNode.name !== "undefined" ) {
+      node.dataset.id = dataNode.name;
+    }
+    node.dataset.nodeId = dataNode.id;
 
     const inputs = document.createElement('div');
     inputs.classList.add("inputs");
