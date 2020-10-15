@@ -225,10 +225,17 @@ import query from './utils/query';
 			}, false);
 
 			// Event examples
-			/*_this.settings.drawFlowModule.on('nodeCreated', function (id) {
-				console.log("Node created " + id);
+			/*_this.settings.drawFlowModule.on('click', function (id) {
+				console.log("mouseup " + id);
 			});
 
+			_this.settings.drawFlowModule.on('mouseup', function (id) {
+				console.log("mouseup " + id);
+			});
+
+			_this.settings.drawFlowModule.on('nodeCreated', function (id) {
+				console.log("Node created " + id);
+			});
 			_this.settings.drawFlowModule.on('nodeRemoved', function (id) {
 				console.log("Node removed " + id);
 			});

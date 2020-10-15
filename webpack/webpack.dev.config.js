@@ -15,7 +15,7 @@ module.exports = {
 	devtool: 'inline-source-map',
 	devServer: {
 		open: true,
-		port: 9000,
+		port: 9001,
 		contentBase: path.join(__dirname, '/..'),
 		openPage: 'example/index.html',
 		writeToDisk: true

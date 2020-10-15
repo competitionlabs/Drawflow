@@ -505,6 +505,10 @@ export default class DrawflowModule {
       }
     }
 
+    if( e.type === "mouseup" ){
+      this.dispatch('mouseup', this.ele_selected.id.slice(5));
+    }
+
     if(this.drag_point) {
       this.ele_selected.classList.remove("selected");
     }
@@ -515,7 +519,6 @@ export default class DrawflowModule {
       this.editor_selected = false;
     }
     if(this.connection === true) {
-      //console.log(ele_last)
       if(ele_last.classList[0] === 'input' || (this.force_first_input && (ele_last.closest(".drawflow_content_node") != null || ele_last.classList[0] === 'drawflow-node'))) {
 
         if(this.force_first_input && (ele_last.closest(".drawflow_content_node") != null || ele_last.classList[0] === 'drawflow-node')) {
@@ -546,6 +549,8 @@ export default class DrawflowModule {
 
             // Conection no exist save connection
             this.onBeforeConnectionCreate(data, this.drawflow, function( callbackData ){
+              const inputConnection = {"node": id_output, "input": output_class, "linkType": ((typeof callbackData.link_type !== "undefined") ? callbackData.link_type : "") };
+
               _thisInstance.connection_ele.classList.add("node_in_"+input_id);
               _thisInstance.connection_ele.classList.add("node_out_"+output_id);
               _thisInstance.connection_ele.classList.add(output_class);
@@ -555,8 +560,8 @@ export default class DrawflowModule {
                 _thisInstance.connection_ele.classList.add(callbackData.extra_class_string);
               }
 
-              _thisInstance.drawflow.drawflow[_thisInstance.module].data[id_output].outputs[output_class].connections.push( {"node": id_input, "output": input_class});
-              _thisInstance.drawflow.drawflow[_thisInstance.module].data[id_input].inputs[input_class].connections.push( {"node": id_output, "input": output_class});
+              _thisInstance.drawflow.drawflow[_thisInstance.module].data[id_output].outputs[output_class].connections.push( {"node": id_input, "output": input_class });
+              _thisInstance.drawflow.drawflow[_thisInstance.module].data[id_input].inputs[input_class].connections.push( inputConnection );
               _thisInstance.updateConnectionNodes('node-'+id_output);
               _thisInstance.updateConnectionNodes('node-'+id_input);
 
@@ -791,8 +796,9 @@ export default class DrawflowModule {
         var data = { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class, extra_class_string: "" };
 
         this.onBeforeConnectionCreate(data, this.drawflow, function( callbackData ){
-          _thisInstance.drawflow.drawflow[nodeOneModule].data[id_output].outputs[output_class].connections.push( {"node": id_input.toString(), "output": input_class});
-          _thisInstance.drawflow.drawflow[nodeOneModule].data[id_input].inputs[input_class].connections.push( {"node": id_output.toString(), "input": output_class});
+          const inputConnection = {"node": id_output.toString(), "input": output_class, "linkType": ((typeof callbackData.link_type !== "undefined") ? callbackData.link_type : "") };
+          _thisInstance.drawflow.drawflow[nodeOneModule].data[id_output].outputs[output_class].connections.push( {"node": id_input.toString(), "output": input_class} );
+          _thisInstance.drawflow.drawflow[nodeOneModule].data[id_input].inputs[input_class].connections.push( inputConnection );
 
           if(_thisInstance.module === nodeOneModule) {
             //Draw connection
